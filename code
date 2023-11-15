@@ -1,0 +1,523 @@
+CODE FOR PHONEBOOK
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct node
+{
+    long long int number;  
+    char name[100];
+    char *group;  
+    struct node *prev;
+    struct node *next;
+};
+
+int membership(char *Name, struct node *head)
+{
+    int there = 0;
+    struct node *q;
+    q = head;
+    while (q != NULL)
+    {
+        if (strcmp(q->name, Name) == 0)
+        {
+            there = 1;
+            return 1;
+            break;
+        }
+        q = q->next;
+    }
+    return there;
+}
+
+int membership_num(long long int num, struct node *head)
+{
+    int there = 0;
+    struct node *q;
+    q = head;
+    while (q != NULL)
+    {
+        if (q->number == num)
+        {
+            there = 1;
+            break;
+        }
+        q = q->next;
+    }
+    return there;
+}
+
+void display_all(struct node *head)
+{
+    while (head != NULL)
+    {
+        if (head->group != NULL)
+        {
+            printf("name: %s \t phone number: %lld \t group: %s \n", head->name, head->number, head->group);
+        }
+        else
+        {
+            printf("name: %s \t phone number: %lld \t group: (Not specified) \n", head->name, head->number);
+        }
+        head = head->next;
+    }
+}
+
+void sort_group(struct node *head, char *group)
+{
+    struct node *q;
+    q = head;
+    while (q != NULL)
+    {
+        if (q->group != NULL && strcmp(q->group, group) == 0)
+        {
+            printf("name: %s \t phone number: %lld \t group: %s \n", q->name, q->number, q->group);
+        }
+        q = q->next;
+    }
+}
+
+struct node *createnode(long long int num, char *Name, char *Group)
+{
+    struct node *head;
+    head = (struct node *)malloc(sizeof(struct node));
+    head->prev = NULL;
+    head->next = NULL;
+
+    if (Group != NULL)
+    {
+        head->group = strdup(Group);
+    }
+    else
+    {
+        head->group = NULL;
+    }
+
+    strcpy(head->name, Name);
+    head->number = num;
+    return head;
+}
+
+struct node *add_new_contact(long long int num, char *Name, char *Group, struct node *head)
+{
+    if (head == NULL)
+    {
+        return createnode(num, Name, Group);
+    }
+    struct node *temp;
+    temp = createnode(num, Name, Group);
+    struct node *q;
+    q = head;
+    while (q->next != NULL)
+    {
+        q = q->next;
+    }
+    q->next = temp;
+    temp->prev = q;
+    temp->next = NULL;
+    return head;
+}
+
+int position(struct node *head, char *name)
+{
+    struct node *q;
+    q = head;
+    int count = 1;
+    while (q != NULL)
+    {
+        if (strcmp(q->name, name) == 0)
+        {
+            return count;
+        }
+        else
+        {
+            q = q->next;
+            count++;
+        }
+    }
+    return 0;
+}
+
+void edit_contact_name(char *Name, struct node *head, char *new_name)
+{
+    int pos = position(head, Name);
+    if (pos == 0)
+    {
+        printf("No such Contact Found");
+    }
+    else
+    {
+        struct node *q;
+        q = head;
+        for (int i = 1; i < pos; i++)
+        {
+            q = q->next;
+        }
+        strcpy(q->name, new_name);
+        printf("Changes Have Been Made!");
+    }
+}
+
+void edit_contact_number(char *Name, struct node *head, long long int num)
+{
+    int pos = position(head, Name);
+    if (pos == 0)
+    {
+        printf("No such Contact Found");
+    }
+    else
+    {
+        struct node *q;
+        q = head;
+        for (int i = 1; i < pos; i++)
+        {
+            q = q->next;
+        }
+        q->number = num;
+        printf("Changes Have Been Made!");
+    }
+}
+
+void edit_contact_group(char *Name, struct node *head, char *Group)
+{
+
+    int pos = position(head, Name);
+    if (pos == 0)
+    {
+        printf("No such Contact Found");
+    }
+    else
+    {
+        struct node *q;
+        q = head;
+        for (int i = 1; i < pos; i++)
+        {
+            q = q->next;
+        }
+        if (q->group != NULL)
+        {
+            free(q->group);
+        }
+        if (Group != NULL)
+        {
+            q->group = strdup(Group);
+        }
+        else
+        {
+            q->group = NULL;
+        }
+        printf("Changes Have Been Made!");
+    }
+}
+
+void search_byname(char *Name, struct node *head)
+{
+    int pos = position(head, Name);
+    if (pos == 0)
+    {
+        printf("Contact Not Found!");
+    }
+    else
+    {
+        struct node *q;
+        q = head;
+        for (int i = 0; i < pos - 1; i++)
+        {
+            q = q->next;
+        }
+        if (q->group != NULL)
+        {
+            printf("name: %s \t phone number: %lld \t group: %s \n", q->name, q->number, q->group);
+        }
+        else
+        {
+            printf("name: %s \t phone number: %lld \t group: (Not specified) \n", q->name, q->number);
+        }
+    }
+}
+
+void search_bynumber(long long int num, struct node *head)
+{
+    if (membership_num(num, head) == 0)
+    {
+        printf("Contact Not Found!");
+    }
+    else
+    {
+        struct node *q;
+        q = head;
+        while (q != NULL)
+        {
+            if (q->number == num)
+            {
+                break;
+            }
+            q = q->next;
+        }
+        if (q->number == num)
+        {
+            if (q->group != NULL)
+            {
+                printf("name: %s \t phone number: %lld \t group: %s \n", q->name, q->number, q->group);
+            }
+            else
+            {
+                printf("name: %s \t phone number: %lld \t group: (Not specified) \n", q->name, q->number);
+            }
+        }
+        else
+        {
+            printf("No Contact Found");
+        }
+    }
+}
+
+void delete_contact(struct node *head, char *Name)
+{
+    int pos = position(head, Name);
+    if (pos == 0)
+    {
+        printf("Contact not found!");
+    }
+    else
+    {
+        struct node *q;
+        struct node *after;
+        struct node *before;
+        q = head;
+        for (int i = 0; i < pos - 1; i++)
+        {
+            q = q->next;
+        }
+        if (head == NULL || q == NULL)
+            return;
+
+        if (head == q)
+            head = q->next;
+
+        if (q->next != NULL)
+            q->next->prev = q->prev;
+
+        if (q->prev != NULL)
+            q->prev->next = q->next;
+
+        if (q->group != NULL)
+        {
+            free(q->group);
+        }
+
+        free(q);
+        printf("Contact Deleted!");
+    }
+}
+
+void sortalpha(struct node *head)
+{
+    struct node *current, *temp;
+    char temp_name[100];
+    long long int temp_number;
+    char temp_group[100];
+
+    if (head == NULL)
+    {
+        return; // Nothing to sort for an empty list.
+    }
+
+    int swapped;
+    do
+    {
+        swapped = 0;
+        current = head;
+
+        while (current->next != NULL)
+        {
+            if (strcmp(current->name, current->next->name) > 0)
+            {
+                // Swap the data fields (name, phone number, group) of the current and next nodes.
+                strcpy(temp_name, current->name);
+                strcpy(current->name, current->next->name);
+                strcpy(current->next->name, temp_name);
+
+                temp_number = current->number;
+                current->number = current->next->number;
+                current->next->number = temp_number;
+
+                strcpy(temp_group, current->group);
+                strcpy(current->group, current->next->group);
+                strcpy(current->next->group, temp_group);
+
+                swapped = 1;
+            }
+            current = current->next;
+        }
+    } while (swapped);
+}
+
+int main()
+{
+    int pin = 9999;
+
+    int input_pin;
+    printf("enter your pin: ");
+    scanf("%d", &input_pin);
+    printf("\n");
+    if (pin == input_pin)
+    {
+        int node_count = 0;
+        int choice;
+
+        struct node *head = NULL;
+        while (1)
+        {
+            printf("\n");
+            printf("1.Add a new contact \n");
+            printf("2.Delete an existing contact \n");
+            printf("3.Edit an existing contact \n");
+            printf("4.Display contacts \n");
+            printf("5.Search contact \n");
+            printf("6.Sort contacts by Groups \n");
+            printf("7.Alphabetically Sort the phonebook \n");
+            printf("8.Quit \n");
+            printf("\n Enter your Choice:");
+            scanf("%d", &choice);
+
+            if (choice == 1)
+            {
+                char name[100];
+                char *group = NULL;
+                long long int num;
+
+                printf("Enter the name: ");
+                scanf("%s", name);
+                printf("Enter the phone number: ");
+                scanf("%lld", &num);
+
+                printf("Do you want to add a group? (y/n): ");
+                char answer;
+                scanf(" %c", &answer);
+                if (answer == 'y' || answer == 'Y')
+                {
+                    group = (char *)malloc(100 * sizeof(char));
+                    printf("Enter the group: ");
+                    scanf("%s", group);
+                }
+
+                if (node_count == 0)
+                {
+                    head = createnode(num, name, group);
+                    node_count++;
+                }
+                else
+                {
+                    head = add_new_contact(num, name, group, head);
+                }
+
+                if (group != NULL)
+                {
+                    free(group);
+                }
+            }
+            else if (choice == 2)
+            {
+                char Name[34];
+                printf("Enter the name: ");
+                scanf("%s", Name);
+
+                delete_contact(head, Name);
+            }
+            else if (choice == 3)
+            {
+                printf("Press 1 to edit the name \n");
+                printf("Press 2 to edit the phone number \n");
+                printf("Press 3 to edit the group \n");
+                int option;
+                printf("Enter your choice");
+                scanf("%d", &option);
+                if (option == 1)
+                {
+                    char Name[100];
+                    printf("Enter the name of the contact: ");
+                    scanf("%s", Name);
+                    char new_Name[100];
+                    printf("Enter the new name of the contact: ");
+                    scanf("%s", new_Name);
+                    edit_contact_name(Name, head, new_Name);
+                }
+                else if (option == 2)
+                {
+                    char Name[100];
+                    printf("Enter the name of the contact: ");
+                    scanf("%s", Name);
+                    long long int new_num = 0;
+                    printf("Enter the new number of the contact: ");
+                    scanf("%lld", &new_num);
+                    edit_contact_number(Name, head, new_num);
+                }
+                else if (option == 3)
+                {
+                    char Name[100];
+                    printf("Enter the name of the contact: ");
+                    scanf("%s", Name);
+                    char new_group[100];
+                    printf("Enter the new group of the contact: ");
+                    scanf("%s", new_group);
+                    edit_contact_group(Name, head, new_group);
+                }
+                else
+                {
+                    printf("Invalid Choice \n");
+                }
+            }
+            else if (choice == 4)
+            {
+                display_all(head);
+            }
+            else if (choice == 5)
+            {
+                printf("Press 1 to search by name \n");
+                printf("Press 2 to search by number \n");
+                int option;
+                scanf("%d", &option);
+                if (option == 1)
+                {
+                    char name[100];
+                    printf("Enter the name: ");
+                    scanf("%s", name);
+                    search_byname(name, head);
+                }
+                else if (option == 2)
+                {
+                    long long int num;
+                    printf("Enter the number: ");
+                    scanf("%lld", &num);
+                    search_bynumber(num, head);
+                }
+            }
+            else if (choice == 6)
+            {
+                char name[100];
+                printf("Enter the group name: ");
+                scanf("%s", name);
+                sort_group(head, name);
+            }
+            else if (choice == 7)
+            {
+                sortalpha(head);
+                printf("The Phone Book Has Been Alphabetically Sorted \n");
+            }
+            else if (choice == 8)
+            {
+                break;
+            }
+            else if (choice < 1 || choice > 8)
+            {
+                printf("Invalid choice! \n");
+            }
+        }
+    }
+    else
+    {
+        printf("Credentials Do Not Match! \n");
+    }
+    return 0;
+}
