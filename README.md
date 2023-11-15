@@ -47,6 +47,8 @@ Acknowledgments
 Thank you to the C programming community for valuable resources and inspiration.
 Author
 PRANAV MATHU
+PARTHAV MATHU
+PRANAY KHURANA
 
 GitHub: PES2UG22CS401
 Contributing
